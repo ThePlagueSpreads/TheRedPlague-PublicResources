@@ -67,6 +67,7 @@ public static class NewInfectionDome
         var farPlaneAdjust = obj.AddComponent<AdjustFarPlane>();
         farPlaneAdjust.newFarClipPlane = 4000;
         farPlaneAdjust.transitionDuration = 10;
+        farPlaneAdjust.maxDepthToApply = 25;
 
         obj.EnsureComponent<ConstructionObstacle>();
         

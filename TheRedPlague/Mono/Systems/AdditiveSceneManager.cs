@@ -10,7 +10,6 @@ public class AdditiveSceneManager : MonoBehaviour
 {
     public Data data;
 
-    public float realtimeLoadDelay = 0.1f;
     public float minTimeForUnload = 5;
 
     private Bounds _realBounds;
@@ -18,10 +17,9 @@ public class AdditiveSceneManager : MonoBehaviour
 
     private Scene _scene;
     private GameObject _sceneRoot;
-    private float _minRealtime;
 
     private float _realtimeLastActive;
-    
+
     private static List<Texture> _lightmapTextures = new();
     private List<Texture> _instanceLightmapTextures;
 
@@ -36,19 +34,20 @@ public class AdditiveSceneManager : MonoBehaviour
                 return texture;
             }
         }
+
         Plugin.Logger.LogWarning($"Failed to find lightmap texture by name {name}!");
         return null;
     }
-    
+
     private void Start()
     {
         PrepareData();
+        LazyUpdate();
         InvokeRepeating(nameof(LazyUpdate), 0.1f + Random.value * 0.2f, 1f);
     }
 
     private void PrepareData()
     {
-        _minRealtime = Time.realtimeSinceStartup + realtimeLoadDelay;
         var encompassingBoxSize = Mathf.Max(data.sceneBounds.size.x, data.sceneBounds.size.z);
         _realBounds = new Bounds(data.sceneBounds.center + data.scenePosition,
             new Vector3(encompassingBoxSize, data.sceneBounds.size.y, encompassingBoxSize));
@@ -75,11 +74,6 @@ public class AdditiveSceneManager : MonoBehaviour
     private void LazyUpdate()
     {
         if (_busyLoading)
-        {
-            return;
-        }
-
-        if (Time.realtimeSinceStartup < _minRealtime)
         {
             return;
         }
@@ -136,7 +130,7 @@ public class AdditiveSceneManager : MonoBehaviour
         _sceneRoot = rootObjects[0];
         _sceneRoot.transform.position = data.scenePosition;
         _sceneRoot.transform.eulerAngles = data.sceneRotation;
-        
+
         var lightmapParent = _sceneRoot.transform.Find(LightmapsMeshObjectName);
         if (lightmapParent != null)
         {
@@ -149,8 +143,10 @@ public class AdditiveSceneManager : MonoBehaviour
                     Plugin.Logger.LogWarning("Null material exists in LightmapsMesh!");
                     continue;
                 }
+
                 _instanceLightmapTextures.Add(material.mainTexture);
             }
+
             _lightmapTextures.AddRange(_instanceLightmapTextures);
         }
         else
@@ -158,9 +154,14 @@ public class AdditiveSceneManager : MonoBehaviour
             Plugin.Logger.LogWarning(
                 $"Child of scene root '{_sceneRoot.transform}' named '{LightmapsMeshObjectName}' not found!");
         }
-        
+
         data.onSceneLoaded.Invoke(_sceneRoot);
 
+        if (data.onSceneLoadedAsync != null)
+        {
+            yield return data.onSceneLoadedAsync.Invoke(_sceneRoot);
+        }
+        
         _busyLoading = false;
         _realtimeLastActive = Time.realtimeSinceStartup;
     }
@@ -207,9 +208,11 @@ public class AdditiveSceneManager : MonoBehaviour
         public Vector3 sceneRotation;
         public float loadDistance;
         public System.Action<GameObject> onSceneLoaded;
+        public System.Func<GameObject, IEnumerator> onSceneLoadedAsync;
 
         public Data(string scenePath, Bounds sceneBounds, Vector3 scenePosition,
-            Vector3 sceneRotation, float loadDistance, System.Action<GameObject> onSceneLoaded)
+            Vector3 sceneRotation, float loadDistance, System.Action<GameObject> onSceneLoaded,
+            System.Func<GameObject, IEnumerator> onSceneLoadedAsync = null)
         {
             this.scenePath = scenePath;
             this.sceneBounds = sceneBounds;
@@ -217,6 +220,7 @@ public class AdditiveSceneManager : MonoBehaviour
             this.sceneRotation = sceneRotation;
             this.loadDistance = loadDistance;
             this.onSceneLoaded = onSceneLoaded;
+            this.onSceneLoadedAsync = onSceneLoadedAsync;
         }
     }
 }

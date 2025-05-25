@@ -21,14 +21,12 @@ public class GenericMusicPlayer : MonoBehaviour
             if (distance > endRange)
             {
                 emitter.Stop();
+                return;
             }
         }
-        else
+        if (distance < startRange)
         {
-            if (distance < startRange)
-            {
-                emitter.Play();
-            }
+            emitter.Play();
         }
     }
 }

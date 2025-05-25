@@ -272,6 +272,9 @@ public class SuitChargeBar : MonoBehaviour
 
     private bool UseInsanityDisplay()
     {
+        if (InsanityDeterrenceZone.GetIsInZoneOfDeterrence(Player.main.transform.position, Player.main.IsInBase()))
+            return false;
+        
         if (PlagueDamageStat.main && PlagueDamageStat.main.InfectionPercent >= 50)
         {
             return true;

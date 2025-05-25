@@ -13,6 +13,7 @@ using TheRedPlague.Mono.CreatureBehaviour.Neural;
 using TheRedPlague.Mono.InfectionLogic;
 using TheRedPlague.PrefabFiles.Buildable;
 using TheRedPlague.PrefabFiles.Items;
+using TheRedPlague.Utilities.Gadgets;
 using UnityEngine;
 
 namespace TheRedPlague.PrefabFiles.Creatures;
@@ -34,11 +35,11 @@ public class ConsciousNeuralMatter : CreatureAsset
             .WithCraftingTime(20)
             .WithFabricatorType(PlagueAltar.CraftTreeType)
             .WithStepsToFabricatorTab(PlagueAltar.PetsTab);
+        CustomPrefab.SetBackgroundType(CustomBackgroundTypes.PlagueItem);
     }
 
     protected override void PostRegister()
     {
-        CraftDataHandler.SetBackgroundType(Info.TechType, CustomBackgroundTypes.PlagueItem);
         KnownTechHandler.SetAnalysisTechEntry(Info.TechType, System.Array.Empty<TechType>(),
             KnownTechHandler.DefaultUnlockData.NewCreatureDiscoveredSound,
             Plugin.AssetBundle.LoadAsset<Sprite>("ConsciousPlagueMatterPopup"));

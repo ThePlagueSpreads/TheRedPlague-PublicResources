@@ -94,6 +94,8 @@ public static class FleshBlobLeaders
         }
 
         obj.AddComponent<FleshBlobGrowth>();
+
+        obj.AddComponent<Deprecate>();
         
         yield break;
     }

@@ -6,11 +6,13 @@ public class AdjustFarPlane : MonoBehaviour
 {
     public float newFarClipPlane;
     public float transitionDuration;
-    
+    public float maxDepthToApply;
+
     private float _oldFarClipPlane;
     private Camera _camera;
-    
+
     private float _changePerSecond;
+    private float _currentFarClipPlane;
 
     private void Start()
     {
@@ -29,7 +31,14 @@ public class AdjustFarPlane : MonoBehaviour
 
     private void LateUpdate()
     {
-        _camera.farClipPlane =
-            Mathf.MoveTowards(_camera.farClipPlane, newFarClipPlane, Time.deltaTime * _changePerSecond);
+        _currentFarClipPlane = Mathf.MoveTowards(_currentFarClipPlane,
+            newFarClipPlane, Time.deltaTime * _changePerSecond);
+        _camera.farClipPlane = GetActualFarClipPlane();
+    }
+
+    private float GetActualFarClipPlane()
+    {
+        return Mathf.Lerp(newFarClipPlane, _oldFarClipPlane,
+            Mathf.InverseLerp(0, maxDepthToApply, Ocean.GetDepthOf(Player.main.gameObject)));
     }
 }

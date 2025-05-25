@@ -20,7 +20,7 @@ public static class LargePlagueCrystal
     {
         var obj = Object.Instantiate(Plugin.AssetBundle.LoadAsset<GameObject>("LargePlagueCrystal"));
         obj.SetActive(false);
-        PrefabUtils.AddBasicComponents(obj, Info.ClassID, Info.TechType, LargeWorldEntity.CellLevel.Near);
+        PrefabUtils.AddBasicComponents(obj, Info.ClassID, Info.TechType, LargeWorldEntity.CellLevel.Far);
         MaterialUtils.ApplySNShaders(obj, 6f, 1f, 0.05f,
             new PlagueCatalystMaterialModifier());
         return obj;

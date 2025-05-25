@@ -39,7 +39,7 @@ public static class AdminFabricator
         customPrefab.CreateFabricator(out var craftTree);
         _adminCraftTree = craftTree;
         customPrefab.SetRecipe(new RecipeData(
-            new CraftData.Ingredient(TechType.Titanium, 2),
+            new CraftData.Ingredient(TechType.Titanium),
             new CraftData.Ingredient(TechType.ComputerChip),
             new CraftData.Ingredient(TechType.Lead)));
         customPrefab.SetPdaGroupCategoryAfter(TechGroup.InteriorModules, TechCategory.InteriorModule, TechType.Fabricator);

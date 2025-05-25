@@ -3,6 +3,7 @@ using ECCLibrary;
 using Nautilus.Assets;
 using Nautilus.Utility;
 using TheRedPlague.Mono.CreatureBehaviour.Sucker;
+using TheRedPlague.Mono.VFX;
 using UnityEngine;
 using UWE;
 
@@ -45,6 +46,8 @@ public class SuckerPrefab
         rb.mass = 20;
         var wf = go.AddComponent<WorldForces>();
         wf.useRigidbody = rb;
+        wf.underwaterDrag = 1.5f;
+        wf.underwaterGravity = 4f;
 
         var blockTrigger = go.transform.Find("BlockTriggers").gameObject;
         
@@ -69,7 +72,10 @@ public class SuckerPrefab
             blockTrigger.SetActive(false);
         }
         
-        go.transform.Find("SuckerV2/Sucker2Armature/Root/Eye").gameObject.AddComponent<SuckerLook>();
+        var look = go.transform.Find("SuckerV2/Sucker2Armature/Root/Eye").gameObject.AddComponent<GenericEyeLook>();
+        look.dotLimit = 0;
+        look.useLimits = true;
+
         go.AddComponent<SuckerDamageable>().animator = go.GetComponentInChildren<Animator>();
 
         var lm = go.AddComponent<LiveMixin>();

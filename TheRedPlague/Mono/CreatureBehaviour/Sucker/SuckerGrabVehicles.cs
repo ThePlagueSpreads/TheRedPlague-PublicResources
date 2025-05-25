@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace TheRedPlague.Mono.CreatureBehaviour.Sucker;
 
@@ -8,34 +10,36 @@ public class SuckerGrabVehicles : MonoBehaviour, IOnTakeDamage
     public float changeDirectionMinDelay = 0.8f;
     public float changeDirectionMaxDelay = 3f;
     public float vehicleAcceleration = 5f;
+    public float exosuitAcceleration = 10f;
     public float vehicleRotationSpeed = 15f;
     public float chanceToMovePerSecond = 0.7f;
-    
+
     public Collider mainCollider;
     public Rigidbody rigidbody;
     public LiveMixin liveMixin;
     public Animator animator;
-    
+
     private Vehicle _currentVehicle;
     private SuckerControllerTarget _target;
-    
+
     private float _timeCanGrabAgain;
     private float _timeChangeDirectionAgain;
     private float _timeDecideToMoveAgain;
     private Quaternion _targetRotation;
     private bool _acceleratingVehicle;
+    private bool _grabbingExosuit;
 
     public bool isPrimaryControllerOfTarget;
     private static readonly int GrabParamId = Animator.StringToHash("latch");
 
     private bool Grabbing => _currentVehicle != null;
-    
+
     private void OnCollisionEnter(Collision other)
     {
         if (Time.time < _timeCanGrabAgain) return;
         if (Grabbing) return;
         if (!liveMixin.IsAlive()) return;
-        
+
         var vehicle = other.gameObject.GetComponent<Vehicle>();
         if (vehicle != null)
         {
@@ -55,7 +59,7 @@ public class SuckerGrabVehicles : MonoBehaviour, IOnTakeDamage
             transform.position = hit.point;
         else
             transform.position += transform.forward * 0.5f;
-        
+
         _target = vehicle.GetComponent<SuckerControllerTarget>();
         if (_target != null)
         {
@@ -65,8 +69,21 @@ public class SuckerGrabVehicles : MonoBehaviour, IOnTakeDamage
         {
             isPrimaryControllerOfTarget = true;
         }
-        
+
         animator.SetBool(GrabParamId, true);
+        _grabbingExosuit = vehicle is Exosuit;
+        if (_grabbingExosuit)
+        {
+            try
+            {
+                var newParent = vehicle.transform.Find("exosuit_01/root/geoChildren");
+                transform.parent = newParent;
+            }
+            catch (Exception e)
+            {
+                Plugin.Logger.LogWarning("Unexpected transform hierarchy in Exosuit: " + e);
+            }
+        }
     }
 
     private void ReleaseFromVehicle()
@@ -94,7 +111,7 @@ public class SuckerGrabVehicles : MonoBehaviour, IOnTakeDamage
             _target.AttachSucker(this);
         }
     }
-    
+
     private void OnDisable()
     {
         if (_target != null)
@@ -126,14 +143,15 @@ public class SuckerGrabVehicles : MonoBehaviour, IOnTakeDamage
         if (!isPrimaryControllerOfTarget) return;
 
         var vehicleRb = _currentVehicle.useRigidbody;
-        
+
         if (_acceleratingVehicle && Ocean.GetDepthOf(gameObject) > 0)
-            vehicleRb.AddRelativeForce(Vector3.forward * vehicleAcceleration, ForceMode.Acceleration);
+            vehicleRb.AddRelativeForce(Vector3.forward * (_grabbingExosuit ? exosuitAcceleration : vehicleAcceleration),
+                ForceMode.Acceleration);
 
         if (Time.time > _timeChangeDirectionAgain)
         {
             _timeChangeDirectionAgain = Time.time + Random.Range(changeDirectionMinDelay, changeDirectionMaxDelay);
-            _targetRotation = Quaternion.LookRotation(Random.onUnitSphere);
+            _targetRotation = GetRandomRotation();
         }
 
         if (Time.time > _timeDecideToMoveAgain)
@@ -143,9 +161,26 @@ public class SuckerGrabVehicles : MonoBehaviour, IOnTakeDamage
         }
     }
 
+    private Quaternion GetRandomRotation()
+    {
+        var direction = Random.onUnitSphere;
+        if (_grabbingExosuit)
+        {
+            direction.y = 0;
+
+            // Fix in case we were super unlucky and got an invalid rotation (if it was looking UP or DOWN before)
+            if (direction.sqrMagnitude < 0.001f)
+                direction = Vector3.forward;
+        }
+
+        return Quaternion.LookRotation(direction);
+    }
+
     private void Update()
     {
-        if (Grabbing) _currentVehicle.useRigidbody.MoveRotation(Quaternion.RotateTowards(_currentVehicle.useRigidbody.rotation, _targetRotation, vehicleRotationSpeed * Time.deltaTime));
+        if (Grabbing)
+            _currentVehicle.useRigidbody.MoveRotation(Quaternion.RotateTowards(_currentVehicle.useRigidbody.rotation,
+                _targetRotation, vehicleRotationSpeed * Time.deltaTime));
     }
 
     public void OnKill()

@@ -242,7 +242,7 @@ public class PlagueRefineryMachine : MonoBehaviour
 
     public bool HasSufficientPower()
     {
-        return !GameModeUtils.RequiresPower() || _powerRelay && _powerRelay.GetPower() >= PowerConsumption;
+        return !GameModeUtils.RequiresPower() || (_powerRelay && _powerRelay.GetPower() >= PowerConsumption);
     }
 
     public bool IsItemReadyForPickUp()

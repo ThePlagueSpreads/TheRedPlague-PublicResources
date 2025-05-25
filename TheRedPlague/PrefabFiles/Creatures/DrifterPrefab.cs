@@ -7,6 +7,7 @@ using Nautilus.Utility;
 using Nautilus.Utility.MaterialModifiers;
 using TheRedPlague.Mono.CreatureBehaviour.Drifter;
 using TheRedPlague.Mono.InfectionLogic;
+using TheRedPlague.Mono.VFX;
 using UnityEngine;
 
 namespace TheRedPlague.PrefabFiles.Creatures;
@@ -45,15 +46,21 @@ public class DrifterPrefab : CreatureAsset
         wf.aboveWaterDrag = 1;
         wf.underwaterDrag = 1;
 
-        var eyeTracking = prefab.AddComponent<DrifterEyeTracking>();
         var eyeArmatureParent = prefab.transform.Find("DrifterAnimated/DrifterArmature/EyeArmature-FIXED");
-        eyeTracking.transforms = new[]
+        var eyeTransforms = new[]
         {
             eyeArmatureParent.Find("Bone 1"),
             eyeArmatureParent.Find("Bone.001 1"),
             eyeArmatureParent.Find("Bone.002"),
             eyeArmatureParent.Find("Bone.003 1")
         };
+
+        foreach (var eye in eyeTransforms)
+        {
+            var look = eye.gameObject.AddComponent<GenericEyeLook>();
+            look.dotLimit = 0.02f;
+            look.useLimits = true;
+        }
 
         var loopingEmitter = prefab.AddComponent<FMOD_CustomLoopingEmitter>();
         loopingEmitter.SetAsset(AudioUtils.GetFmodAsset("DrifterIdle"));

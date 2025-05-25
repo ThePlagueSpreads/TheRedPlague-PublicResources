@@ -1,11 +1,17 @@
-﻿using Nautilus.Utility;
+﻿using System.Diagnostics.CodeAnalysis;
+using Nautilus.Utility;
 using TheRedPlague.Mono.VFX;
 using UnityEngine;
 
 namespace TheRedPlague.Mono.Buildables.AssimilationGenerator;
 
-public class AssimilationGeneratorFunction : MonoBehaviour
+public class AssimilationGeneratorFunction : MonoBehaviour, IHandTarget, IConstructable
 {
+    private static readonly bool Debug = false;
+    
+    public PowerSource powerSource;
+    public PowerRelay relay;
+
     public Constructable constructable;
 
     public Animator animator;
@@ -16,6 +22,15 @@ public class AssimilationGeneratorFunction : MonoBehaviour
     private static readonly FMODAsset BiteSound = AudioUtils.GetFmodAsset("AssimilationGeneratorBite");
 
     public float glowStrength = 1f;
+
+    public float powerPerSecond = 2f;
+
+    public float minDurationPerFood = 30f;
+    public float maxDurationPerFood = 195f;
+    public float minExpectedBioreactorCharge = 100f;
+    public float maxExpectedBioreactorCharge = 1000f;
+    
+    public float maxReserveTime = 600;
 
     private bool _active;
     private float _timeDeactivate;
@@ -35,11 +50,27 @@ public class AssimilationGeneratorFunction : MonoBehaviour
         animator.SetTrigger(Gobble);
         animator.SetBool(Working, true);
         Utils.PlayFMODAsset(BiteSound, transform.position + transform.up * 5);
-        _timeDeactivate = Time.time + 60;
+        var duration = GetChargeDuration(bioreactorCharge);
+        if (Debug)
+            Plugin.Logger.LogInfo("Consuming " + item.name + ": " + duration + " seconds");
+        if (_active)
+        {
+            _timeDeactivate = Mathf.Min(_timeDeactivate + duration, Time.time + maxReserveTime);
+        }
+        else
+        {
+            _timeDeactivate = DayNightCycle.main.timePassedAsFloat + duration;
+        }
         glowAnimator.SetTargetPropertyValue(glowStrength);
         Invoke(nameof(PlayLoopSound), 5);
         activateEmitter.Play();
         _active = true;
+    }
+
+    private float GetChargeDuration(float bioreactorCharge)
+    {
+        return Mathf.Lerp(minDurationPerFood, maxDurationPerFood,
+            Mathf.InverseLerp(minExpectedBioreactorCharge, maxExpectedBioreactorCharge, bioreactorCharge));
     }
 
     private void PlayLoopSound()
@@ -49,10 +80,15 @@ public class AssimilationGeneratorFunction : MonoBehaviour
 
     private void Update()
     {
-        if (_active && Time.time > _timeDeactivate)
+        if (!_active) return;
+        
+        if (DayNightCycle.main.timePassedAsFloat > _timeDeactivate)
         {
             Deactivate();
+            return;
         }
+            
+        relay.ModifyPower(powerPerSecond * DayNightCycle.main.deltaTime, out _);
     }
 
     private void Deactivate()
@@ -63,5 +99,38 @@ public class AssimilationGeneratorFunction : MonoBehaviour
         animator.SetBool(Working, false);
         animator.SetBool(Working, false);
         loopEmitter.Stop();
+    }
+
+    public void OnHandHover(GUIHand hand)
+    {
+        if (constructable.constructed)
+        {
+            HandReticle.main.SetText(HandReticle.TextType.Hand,
+                Language.main.GetFormat("AssimilationGeneratorStatus",
+                    Mathf.RoundToInt(powerSource.GetPower()),
+                    Mathf.RoundToInt(powerSource.GetMaxPower())),
+                false);
+            HandReticle.main.SetText(HandReticle.TextType.HandSubscript, string.Empty, false);
+            HandReticle.main.SetIcon(HandReticle.IconType.Hand);
+        }
+    }
+
+    public void OnHandClick(GUIHand hand)
+    {
+    }
+
+    public bool IsDeconstructionObstacle()
+    {
+        return true;
+    }
+
+    public bool CanDeconstruct([UnscopedRef] out string reason)
+    {
+        reason = null;
+        return true;
+    }
+
+    public void OnConstructedChanged(bool constructed)
+    {
     }
 }

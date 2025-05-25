@@ -4,6 +4,7 @@ using ECCLibrary.Data;
 using Nautilus.Assets;
 using TheRedPlague.Data;
 using TheRedPlague.Mono.CreatureBehaviour.Sucker;
+using TheRedPlague.Mono.VFX;
 using UnityEngine;
 
 namespace TheRedPlague.PrefabFiles.Creatures;
@@ -36,24 +37,27 @@ public class SuckerController : CreatureAsset
     protected override IEnumerator ModifyPrefab(GameObject prefab, CreatureComponents components)
     {
         var grab = prefab.AddComponent<SuckerGrabVehicles>();
-        
+
         grab.rigidbody = components.Rigidbody;
         grab.mainCollider = prefab.GetComponent<Collider>();
         grab.liveMixin = components.LiveMixin;
         grab.animator = prefab.GetComponentInChildren<Animator>();
-        
-        prefab.transform.Find("SuckerV2/Sucker2Armature/Root/Eye").gameObject.AddComponent<SuckerLook>();
 
+        var look = prefab.transform.Find("SuckerV2/Sucker2Armature/Root/Eye").gameObject.AddComponent<GenericEyeLook>();
+        look.dotLimit = 0;
+        look.useLimits = true;
+        
         var target = prefab.AddComponent<SuckerTargetTechnology>();
         target.radius = 20;
         target.swimVelocity = 4;
         target.evaluatePriority = 0.6f;
-        
+
         yield break;
     }
 
     protected override void PostRegister()
     {
-        InfectionSettingsDatabase.InfectionSettingsList.Add(PrefabInfo.TechType, new InfectionSettings(Color.white, 0f));
+        InfectionSettingsDatabase.InfectionSettingsList.Add(PrefabInfo.TechType,
+            new InfectionSettings(Color.white, 0f));
     }
 }

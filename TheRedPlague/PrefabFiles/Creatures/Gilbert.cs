@@ -13,6 +13,7 @@ using TheRedPlague.Mono.CreatureBehaviour;
 using TheRedPlague.Mono.InfectionLogic;
 using TheRedPlague.PrefabFiles.Buildable;
 using TheRedPlague.PrefabFiles.Items;
+using TheRedPlague.Utilities.Gadgets;
 using UnityEngine;
 
 namespace TheRedPlague.PrefabFiles.Creatures;
@@ -32,9 +33,9 @@ public class Gilbert : CreatureAsset
             .WithFabricatorType(PlagueAltar.CraftTreeType)
             .WithStepsToFabricatorTab(PlagueAltar.PetsTab)
             .WithCraftingTime(15);
+        CustomPrefab.SetBackgroundType(CustomBackgroundTypes.PlagueItem);
         CreatureDataUtils.AddCreaturePDAEncyclopediaEntry(this, CustomPdaPaths.PlagueCreationsPath,
             null, null, 3, null, null);
-        CraftDataHandler.SetBackgroundType(Info.TechType, CustomBackgroundTypes.PlagueItem);
     }
 
     protected override CreatureTemplate CreateTemplate()
