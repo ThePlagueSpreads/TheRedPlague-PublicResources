@@ -5,6 +5,7 @@ using Nautilus.Crafting;
 using Nautilus.Handlers;
 using Nautilus.Utility;
 using TheRedPlague.Data;
+using TheRedPlague.Utilities.Gadgets;
 using UnityEngine;
 
 namespace TheRedPlague.PrefabFiles.Items;
@@ -20,9 +21,8 @@ public static class PlagueIngot
         prefab.SetGameObject(CreatePrefab);
         prefab.SetPdaGroupCategory(CustomTechCategories.PlagueBiotechGroup, CustomTechCategories.PlagueBiotechCategory);
         prefab.SetRecipe(new RecipeData(new CraftData.Ingredient(PlagueCatalyst.Info.TechType)));
+        prefab.SetBackgroundType(CustomBackgroundTypes.PlagueItem);
         prefab.Register();
-        
-        CraftDataHandler.SetBackgroundType(Info.TechType, CustomBackgroundTypes.PlagueItem);
         
         BaseBioReactor.charge[Info.TechType] = 600;
     }

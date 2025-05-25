@@ -7,6 +7,7 @@ using Nautilus.Utility;
 using TheRedPlague.Data;
 using TheRedPlague.Mono.Equipment;
 using TheRedPlague.PrefabFiles.Buildable;
+using TheRedPlague.Utilities.Gadgets;
 using UnityEngine;
 
 namespace TheRedPlague.PrefabFiles.Equipment;
@@ -28,9 +29,8 @@ public static class PlagueKnife
             .WithCraftingTime(8)
             .WithFabricatorType(AdminFabricator.AdminCraftTree);
         plagueKnife.SetPdaGroupCategoryAfter(TechGroup.Personal, TechCategory.Tools, TechType.Knife);
+        plagueKnife.SetBackgroundType(CustomBackgroundTypes.PlagueItem);
         plagueKnife.Register();
-        
-        CraftDataHandler.SetBackgroundType(Info.TechType, CustomBackgroundTypes.PlagueItem);
     }
 
     private static void ModifyPrefab(GameObject prefab)

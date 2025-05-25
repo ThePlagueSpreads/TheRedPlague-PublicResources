@@ -5,6 +5,7 @@ using Nautilus.Utility;
 using TheRedPlague.Data;
 using TheRedPlague.Mono.Util;
 using TheRedPlague.PrefabFiles.Buildable;
+using TheRedPlague.Utilities.Gadgets;
 using UnityEngine;
 
 namespace TheRedPlague.PrefabFiles.Items;
@@ -18,10 +19,9 @@ public static class MysteriousRemains
     {
         var prefab = new CustomPrefab(Info);
         prefab.SetGameObject(GetGameObject);
+        prefab.SetBackgroundType(CustomBackgroundTypes.PlagueItem);
         prefab.Register();
         
-        CraftDataHandler.SetBackgroundType(Info.TechType, CustomBackgroundTypes.PlagueItem);
-
         PlagueRefinery.RegisterPlagueRefineryRecipe(Info.TechType);
 
         BaseBioReactor.charge[Info.TechType] = 400;

@@ -11,6 +11,7 @@ using Nautilus.Utility;
 using TheRedPlague.Data;
 using TheRedPlague.Mono.InfectionLogic;
 using TheRedPlague.PrefabFiles.Buildable;
+using TheRedPlague.Utilities.Gadgets;
 using UnityEngine;
 
 namespace TheRedPlague.PrefabFiles.Items;
@@ -24,7 +25,7 @@ public class Meatball : CreatureAsset
             .WithFabricatorType(CraftTree.Type.Fabricator)
             .WithStepsToFabricatorTab(CraftTreeHandler.Paths.FabricatorMachines);
         CustomPrefab.SetPdaGroupCategory(CustomTechCategories.PlagueBiotechGroup, CustomTechCategories.PlagueBiotechCategory);
-        CraftDataHandler.SetBackgroundType(PrefabInfo.TechType, CustomBackgroundTypes.PlagueItem);
+        CustomPrefab.SetBackgroundType(CustomBackgroundTypes.PlagueItem);
 
         KnownTechHandler.SetAnalysisTechEntry(RedPlagueSample.Info.TechType, new[] { prefabInfo.TechType },
             KnownTechHandler.DefaultUnlockData.BasicUnlockSound,

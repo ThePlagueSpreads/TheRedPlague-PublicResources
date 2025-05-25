@@ -2,6 +2,7 @@
 using Nautilus.Handlers;
 using Nautilus.Utility;
 using TheRedPlague.Data;
+using TheRedPlague.Utilities.Gadgets;
 using UnityEngine;
 
 namespace TheRedPlague.PrefabFiles.Items;
@@ -16,9 +17,8 @@ public static class DormantNeuralMatter
     {
         var prefab = new CustomPrefab(Info);
         prefab.SetGameObject(GetPrefab);
+        prefab.SetBackgroundType(CustomBackgroundTypes.PlagueItem);
         prefab.Register();
-        
-        CraftDataHandler.SetBackgroundType(Info.TechType, CustomBackgroundTypes.PlagueItem);
         
         BaseBioReactor.charge[Info.TechType] = 1400;
     }

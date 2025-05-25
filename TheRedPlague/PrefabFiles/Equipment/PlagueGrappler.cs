@@ -12,6 +12,7 @@ using TheRedPlague.Data;
 using TheRedPlague.Mono.Equipment;
 using TheRedPlague.PrefabFiles.Buildable;
 using TheRedPlague.PrefabFiles.Items;
+using TheRedPlague.Utilities.Gadgets;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -34,9 +35,8 @@ public static class PlagueGrappler
             .WithFabricatorType(PlagueAltar.CraftTreeType)
             .WithStepsToFabricatorTab(PlagueAltar.EquipmentTab);
         prefab.SetEquipment(EquipmentType.Hand);
+        prefab.SetBackgroundType(CustomBackgroundTypes.PlagueItem);
         prefab.Register();
-        
-        CraftDataHandler.SetBackgroundType(Info.TechType, CustomBackgroundTypes.PlagueItem);
     }
     
     public static void RegisterLateStoryData()

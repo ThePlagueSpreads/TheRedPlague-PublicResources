@@ -5,6 +5,7 @@ using Nautilus.Crafting;
 using Nautilus.Handlers;
 using Nautilus.Utility;
 using TheRedPlague.Data;
+using TheRedPlague.Utilities.Gadgets;
 using UnityEngine;
 
 namespace TheRedPlague.PrefabFiles.Items;
@@ -33,9 +34,8 @@ public static class BloodQuartz
                 material.SetFloat("_Fresnel", 0.5f);
             }
         });
+        prefab.SetBackgroundType(CustomBackgroundTypes.PlagueItem);
         prefab.Register();
-
-        CraftDataHandler.SetBackgroundType(Info.TechType, CustomBackgroundTypes.PlagueItem);
 
         var bloodToNormalQuartzPrefab = new CustomPrefab(_bloodToNormalQuartz);
         bloodToNormalQuartzPrefab.SetRecipe(new RecipeData(new CraftData.Ingredient(Info.TechType))

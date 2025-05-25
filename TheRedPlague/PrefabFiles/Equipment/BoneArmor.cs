@@ -10,6 +10,7 @@ using TheRedPlague.Data;
 using TheRedPlague.PrefabFiles.Buildable;
 using TheRedPlague.PrefabFiles.Creatures;
 using TheRedPlague.PrefabFiles.Items;
+using TheRedPlague.Utilities.Gadgets;
 using UnityEngine;
 
 namespace TheRedPlague.PrefabFiles.Equipment;
@@ -33,9 +34,8 @@ public static class BoneArmor
             .WithFabricatorType(PlagueAltar.CraftTreeType)
             .WithStepsToFabricatorTab(PlagueAltar.EquipmentTab);
         prefab.SetPdaGroupCategory(CustomTechCategories.PlagueBiotechGroup, CustomTechCategories.PlagueBiotechCategory);
+        prefab.SetBackgroundType(CustomBackgroundTypes.PlagueItem);
         prefab.Register();
-        
-        CraftDataHandler.SetBackgroundType(Info.TechType, CustomBackgroundTypes.PlagueItem);
     }
     
     public static void RegisterLateStoryData()

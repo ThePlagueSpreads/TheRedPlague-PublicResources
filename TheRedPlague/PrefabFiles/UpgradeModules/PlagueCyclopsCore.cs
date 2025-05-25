@@ -6,6 +6,7 @@ using Nautilus.Handlers;
 using Nautilus.Utility;
 using Nautilus.Utility.MaterialModifiers;
 using TheRedPlague.Data;
+using TheRedPlague.Utilities.Gadgets;
 
 namespace TheRedPlague.PrefabFiles.UpgradeModules;
 
@@ -20,9 +21,8 @@ public static class PlagueCyclopsCore
         var prefab = new CustomPrefab(Info);
         prefab.SetGameObject(GetGameObject);
         prefab.SetEquipment(EquipmentType.CyclopsModule);
+        prefab.SetBackgroundType(CustomBackgroundTypes.PlagueItem);
         prefab.Register();
-        
-        CraftDataHandler.SetBackgroundType(Info.TechType, CustomBackgroundTypes.PlagueItem);
     }
 
     private static GameObject GetGameObject()

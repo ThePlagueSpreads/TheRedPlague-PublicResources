@@ -3,6 +3,7 @@ using Nautilus.Handlers;
 using Nautilus.Utility;
 using TheRedPlague.Data;
 using TheRedPlague.MaterialModifiers;
+using TheRedPlague.Utilities.Gadgets;
 using UnityEngine;
 
 namespace TheRedPlague.PrefabFiles.Items;
@@ -16,9 +17,8 @@ public static class PlagueCatalyst
     {
         var prefab = new CustomPrefab(Info);
         prefab.SetGameObject(GetGameObject);
+        prefab.SetBackgroundType(CustomBackgroundTypes.PlagueItem);
         prefab.Register();
-        
-        CraftDataHandler.SetBackgroundType(Info.TechType, CustomBackgroundTypes.PlagueItem);
     }
 
     private static GameObject GetGameObject()
