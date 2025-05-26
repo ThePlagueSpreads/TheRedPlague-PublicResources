@@ -11,13 +11,13 @@ namespace TheRedPlague.Mono.Insanity;
 public class InsanityManager : MonoBehaviour
 {
     public static InsanityManager Main { get; private set; }
-    
+
     public float Insanity { get; private set; }
 
     private const float UpdateRate = 0.5f;
-    
+
     private readonly List<InsanitySymptom> _symptoms = new();
-    
+
     private static readonly Dictionary<string, float> BiomeInfectionPercentages = new()
     {
         { "skyisland", 30f },
@@ -80,7 +80,7 @@ public class InsanityManager : MonoBehaviour
         Insanity = CalculatePlayerInsanity();
 
         var isInsanitySystemActive = IsInsanitySystemActive();
-        
+
         // Update active symptoms
         foreach (var symptom in _symptoms)
         {
@@ -120,6 +120,8 @@ public class InsanityManager : MonoBehaviour
     {
         if (PlagueDamageStat.main == null) return 0;
         if (!Plugin.Options.EnableInsanityInCreative && GameModeUtils.IsInvisible()) return 0;
+        if (InsanityDeterrenceZone.GetIsInZoneOfDeterrence(Player.main.transform.position, Player.main.IsInBase()))
+            return 0;
         return PlagueDamageStat.main.InfectionPercent + GetBiomeInsanityPercentage();
     }
 
