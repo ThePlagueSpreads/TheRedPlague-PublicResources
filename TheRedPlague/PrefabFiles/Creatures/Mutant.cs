@@ -6,6 +6,7 @@ using Nautilus.Assets;
 using Nautilus.Handlers;
 using Nautilus.Utility;
 using Nautilus.Utility.MaterialModifiers;
+using TheRedPlague.Data;
 using TheRedPlague.MaterialModifiers;
 using TheRedPlague.Mono.CreatureBehaviour.Mutants;
 using TheRedPlague.Mono.InfectionLogic;
@@ -18,6 +19,7 @@ public class Mutant : CreatureAsset
 {
     private readonly string _prefabName;
     private readonly Settings _settings;
+    private readonly bool _pdaEntry;
 
     private const float NormalVariantVelocity = 3f;
     private const float HeavilyMutatedVelocity = 14f;
@@ -26,14 +28,21 @@ public class Mutant : CreatureAsset
     private static readonly FMODAsset LargeMutantIdle = AudioUtils.GetFmodAsset("LargeMutantIdle");
 
     // PrefabName expects a prefab from the normal Red Plague Asset Bundle, NOT the creature Asset Bundle
-    public Mutant(PrefabInfo prefabInfo, string prefabName, Settings settings) : base(prefabInfo)
+    public Mutant(PrefabInfo prefabInfo, string prefabName, Settings settings, bool pdaEntry) : base(prefabInfo)
     {
         _prefabName = prefabName;
         _settings = settings;
+        _pdaEntry = pdaEntry;
     }
 
     protected override void PostRegister()
     {
+        if (_pdaEntry)
+        {
+            CreatureDataUtils.AddCreaturePDAEncyclopediaEntry(this, CustomPdaPaths.RedPlagueVictimsPath, null, null, 3,
+                null, null);
+        }
+        
         if (_settings.HasFlag(Settings.HeavilyMutated))
         {
             LootDistributionHandler.AddLootDistributionData(PrefabInfo.ClassID,
@@ -66,7 +75,7 @@ public class Mutant : CreatureAsset
             );
             return;
         }
-        
+
         LootDistributionHandler.AddLootDistributionData(PrefabInfo.ClassID,
             new LootDistributionData.BiomeData
             {
@@ -169,7 +178,8 @@ public class Mutant : CreatureAsset
 
     protected override CreatureTemplate CreateTemplate()
     {
-        var template = new CreatureTemplate(() => Plugin.AssetBundle.LoadAsset<GameObject>(_prefabName), BehaviourType.Shark,
+        var template = new CreatureTemplate(() => Plugin.AssetBundle.LoadAsset<GameObject>(_prefabName),
+            BehaviourType.Shark,
             EcoTargetType.Shark, 5000f);
         CreatureTemplateUtils.SetCreatureDataEssentials(template, LargeWorldEntity.CellLevel.Medium, 500, -0.5f);
         CreatureTemplateUtils.SetCreatureMotionEssentials(template,
@@ -178,7 +188,7 @@ public class Mutant : CreatureAsset
             new StayAtLeashData(0.4f, IsHeavilyMutated() ? HeavilyMutatedVelocity : NormalVariantVelocity, 50f));
         template.LocomotionData = new LocomotionData(5f, IsHeavilyMutated() ? 3 : 0.6f);
         template.AggressiveWhenSeeTargetList = new List<AggressiveWhenSeeTargetData>()
-            {new(EcoTargetType.Shark, IsHeavilyMutated() ? 3 : 1, 40, 2)};
+            { new(EcoTargetType.Shark, IsHeavilyMutated() ? 3 : 1, 40, 2) };
         template.AttackLastTargetData =
             new AttackLastTargetData(0.5f, IsHeavilyMutated() ? 20f : NormalVariantVelocity * 2f,
                 0.5f, IsHeavilyMutated() ? 30 : 7, IsHeavilyMutated() ? 0.1f : 10);

@@ -2,13 +2,13 @@
 using Nautilus.Assets;
 using Nautilus.Assets.Gadgets;
 using Nautilus.Crafting;
-using Nautilus.Handlers;
 using Nautilus.Utility;
 using TheRedPlague.Data;
 using TheRedPlague.Mono.Buildables.AssimilationGenerator;
 using TheRedPlague.Mono.VFX;
 using TheRedPlague.PrefabFiles.Creatures;
 using TheRedPlague.PrefabFiles.Items;
+using TheRedPlague.Utilities.Gadgets;
 using UnityEngine;
 
 namespace TheRedPlague.PrefabFiles.Buildable;
@@ -26,9 +26,8 @@ public static class AssimilationGenerator
         prefab.SetRecipe(new RecipeData(
             new CraftData.Ingredient(PlagueIngot.Info.TechType, 3),
             new CraftData.Ingredient(ConsciousNeuralMatter.Info.TechType)));
+        prefab.SetBackgroundType(CustomBackgroundTypes.PlagueItem);
         prefab.Register();
-
-        CraftDataHandler.SetBackgroundType(Info.TechType, CustomBackgroundTypes.PlagueItem);
     }
 
     private static IEnumerator CreatePrefab(IOut<GameObject> result)
@@ -72,7 +71,31 @@ public static class AssimilationGenerator
         animateEmission.propertyIds = new[] { ShaderPropertyID._GlowStrength, ShaderPropertyID._GlowStrengthNight };
         function.glowAnimator = animateEmission;
 
+        var solarPanelTask = CraftData.GetPrefabForTechTypeAsync(TechType.SolarPanel);
+        yield return solarPanelTask;
+        var solarPanel = solarPanelTask.GetResult();
+
+        if (solarPanel == null)
+        {
+            Plugin.Logger.LogWarning("SolarPanel prefab somehow not found (CraftData.GetPrefabForTechTypeAsync).");
+        }
+
+        var powerRelay = prefab.AddComponent<PowerRelay>();
+        powerRelay.maxOutboundDistance = 30;
+        powerRelay.powerSystemPreviewPrefab = solarPanel.GetComponent<PowerRelay>().powerSystemPreviewPrefab;
+
+        var powerFx = prefab.AddComponent<PowerFX>();
+        powerFx.attachPoint = prefab.transform.Find("PowerFX_AttachPoint");
+        powerFx.vfxPrefab = solarPanel.GetComponent<PowerFX>().vfxPrefab;
+        powerRelay.powerFX = powerFx;
+
+        var powerSource = prefab.AddComponent<PowerSource>();
+        powerSource.maxPower = 666;
+        powerRelay.internalPowerSource = powerSource;
+        
+        function.powerSource = powerSource;
+        function.relay = powerRelay;
+
         result.Set(prefab);
-        yield break;
     }
 }

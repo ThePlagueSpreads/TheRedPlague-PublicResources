@@ -21,7 +21,7 @@ public class PlagueArmorBehavior : MonoBehaviour
 
     public void SetArmorActive(bool state)
     {
-        if (state && _currentArmor == null)
+        if (state && _currentArmor == null && !GameOptions.GetVrAnimationMode())
         {
             SpawnArmor();
         }

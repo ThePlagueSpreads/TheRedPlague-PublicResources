@@ -10,6 +10,7 @@ using Story;
 using TheRedPlague.Data;
 using TheRedPlague.Mono.Buildables.PlagueAltar;
 using TheRedPlague.PrefabFiles.Items;
+using TheRedPlague.Utilities.Gadgets;
 using UnityEngine;
 
 namespace TheRedPlague.PrefabFiles.Buildable;
@@ -39,10 +40,9 @@ public static class PlagueAltar
             new CraftData.Ingredient(PlagueIngot.Info.TechType, 3),
             new CraftData.Ingredient(RedPlagueSample.Info.TechType),
             new CraftData.Ingredient(ModPrefabs.AmalgamatedBone.TechType)));
+        prefab.SetBackgroundType(CustomBackgroundTypes.PlagueItem);
         prefab.Register();
-
-        CraftDataHandler.SetBackgroundType(Info.TechType, CustomBackgroundTypes.PlagueItem);
-
+        
         CraftTreeType = EnumHandler.AddEntry<CraftTree.Type>(CraftTreeName).CreateCraftTreeRoot(out var root);
         root.AddTabNode(ConsumableTab, null, Plugin.AssetBundle.LoadAsset<Sprite>("PlagueAltarTab_Consumable"));
         root.AddTabNode(EquipmentTab, null, Plugin.AssetBundle.LoadAsset<Sprite>("PlagueAltarTab_Equipment"));

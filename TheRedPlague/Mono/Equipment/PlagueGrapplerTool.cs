@@ -14,7 +14,6 @@ public class PlagueGrapplerTool : PlayerTool
     public Transform lineAttachPoint;
 
     private PlagueGrapplerProjectile _projectile;
-    private bool _manipulateModeActive;
     private float _timeLastDeployed;
     
     public override string animToolName => "stasisrifle";

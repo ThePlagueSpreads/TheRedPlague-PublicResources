@@ -3,8 +3,12 @@ using Nautilus.Assets.Gadgets;
 using UnityEngine;
 using System.Collections;
 using Nautilus.Assets.PrefabTemplates;
+using Nautilus.Crafting;
+using Nautilus.Handlers;
 using Nautilus.Utility;
 using TheRedPlague.Mono.Equipment;
+using TheRedPlague.PrefabFiles.Buildable;
+using TheRedPlague.PrefabFiles.Creatures;
 
 namespace TheRedPlague.PrefabFiles.Equipment;
 
@@ -14,14 +18,21 @@ public static class InfectionTracker
 
     public static void Register()
     {
-        var infectionTrackerPrefab = new CustomPrefab(Info);
+        var prefab = new CustomPrefab(Info);
         var infectionTrackerTemplate = new CloneTemplate(Info, "b98da0ef-29d4-4571-9a82-53a6e6706153");
         infectionTrackerTemplate.ModifyPrefabAsync += ModifyPrefab;
-        infectionTrackerPrefab.SetGameObject(infectionTrackerTemplate);
-        infectionTrackerPrefab.SetEquipment(EquipmentType.Hand);
-        // infectionTrackerPrefab.SetSpawns(new SpawnLocation(new Vector3(-52.575f, 312.560f, -68.644f), new Vector3(4.3f, 0.68f, 18f)));
-        infectionTrackerPrefab.Info.WithIcon(Plugin.AssetBundle.LoadAsset<Sprite>("InfectionTrackerIcon"));
-        infectionTrackerPrefab.Register();
+        prefab.SetGameObject(infectionTrackerTemplate);
+        prefab.SetEquipment(EquipmentType.Hand);
+        prefab.Info.WithIcon(Plugin.AssetBundle.LoadAsset<Sprite>("InfectionTrackerIcon"));
+        KnownTechHandler.SetAnalysisTechEntry(Info.TechType,
+            System.Array.Empty<TechType>(), KnownTechHandler.DefaultUnlockData.BlueprintUnlockSound,
+            Plugin.AssetBundle.LoadAsset<Sprite>("InfectionTrackerPopup"));
+        prefab.SetRecipe(new RecipeData(new CraftData.Ingredient(TechType.PrecursorIonCrystal),
+                new CraftData.Ingredient(ConsciousNeuralMatter.Info.TechType)))
+            .WithCraftingTime(5)
+            .WithFabricatorType(AdminFabricator.AdminCraftTree);
+        prefab.SetPdaGroupCategoryAfter(TechGroup.Personal, TechCategory.Equipment, TechType.PrecursorKey_Orange);
+        prefab.Register();
     }
 
     private static IEnumerator ModifyPrefab(GameObject prefab)
@@ -77,5 +88,8 @@ public static class InfectionTracker
         rb.mass = 200;
         rb.useGravity = false;
         prefab.EnsureComponent<WorldForces>();
+
+        PrefabUtils.AddVFXFabricating(worldModel, "alien_relic_ctrl/alien_relic_04", -0.03f, 0.1f,
+            new Vector3(0, 0, 0), 0.5f, new Vector3(-90, 0, 0));
     }
 }
