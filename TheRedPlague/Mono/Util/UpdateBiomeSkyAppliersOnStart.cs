@@ -37,7 +37,7 @@ public class UpdateBiomeSkyAppliersOnStart : MonoBehaviour
         {
             var environmentSky =
                 WaterBiomeManager.main.GetBiomeEnvironment(transform.position + offsetForExteriorPosition);
-            skyAppliersToUpdate = environmentSky?.skyAppliers?.ToArray();
+            skyAppliersToUpdate = environmentSky?.skyAppliers;
         }
 
         if (skyAppliersToUpdate == null)
